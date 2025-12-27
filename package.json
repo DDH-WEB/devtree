@@ -1,0 +1,23 @@
+{
+  "name": "devtree",
+  "version": "1.0.0",
+  "description": "Profundizando con node.js",
+  "homepage": "https://github.com/DDH-WEB/devtree#readme",
+  "bugs": {
+    "url": "https://github.com/DDH-WEB/devtree/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DDH-WEB/devtree.git"
+  },
+  "license": "ISC",
+  "author": "Denis Yampol Davila Huamán | https://ddhdev.vercel.app/",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
