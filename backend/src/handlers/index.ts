@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator'
 import slug from 'slug'
 import User from "../model/User"
 import { checkPassword, hashPassword } from '../utils/auth'
+import { generateJWT } from '../utils/jwt'
 
 export const createAccount = async (req: Request, res: Response) => {
     const { email, password } = req.body
@@ -42,9 +43,13 @@ export const login = async (req: Request, res: Response) => {
     //comprobar su password
     const isPasswordCorrect = await checkPassword(password, user.password as string)
     if(!isPasswordCorrect) {
-        const error = new Error('Contraseña Incorrecta')
+        const error = new Error('Usuario o Contraseña Incorrecta')
         return res.status(401).json({ error: error.message })
-    }
+    }   
 
-    res.status(200).json({ message: 'Usuario Autenticado Correctamente' })
+    //Generar JWT
+    const token = generateJWT({id: user._id})
+
+    // res.send(`Usuario Verificado - Bienvenido ${user.name}`)
+    res.send(token)
 }
