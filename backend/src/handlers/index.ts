@@ -8,15 +8,15 @@ export const createAccount = async (req: Request, res: Response) => {
     const { email, password } = req.body
     const userExist = await User.findOne({ email })
     if (userExist) {
-        const error = new Error('El Usuario ya Esta Registrado')
-        return res.status(409).json({ error: error.message })
+        const error = new Error('El Email ya Esta Registrado')
+        return res.status(409).json({ error: error.message, value: 1 })
     }
 
     const handle = slug(req.body.handle, '')
     const handleExist = await User.findOne({ handle })
     if (handleExist) {
-        const error = new Error('Nombre no Disponible')
-        return res.status(409).json({ error: error.message })
+        const error = new Error('El Nombre de usuario no esta disponible')
+        return res.status(409).json({ error: error.message, value: 2 })
     }
 
     const user = new User(req.body)
