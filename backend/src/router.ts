@@ -1,6 +1,6 @@
 import { Router, type RequestHandler } from 'express'
 import { body } from 'express-validator'
-import { createAccount, getUserAuthenticated, login } from './handlers'
+import { createAccount, getUserAuthenticated, login, updateProfile } from './handlers'
 import { handleInputErrors } from './middleware/validation'
 import { authenticate } from './middleware/auth'
 
@@ -40,5 +40,17 @@ router.post('/auth/login',
 )
 
 router.get('/user', authenticate, getUserAuthenticated)
+
+router.patch('/user', 
+    body('handle')
+        .notEmpty()
+        .withMessage('El Handle no puede ir Vació'),
+    body('description')
+        .notEmpty()
+        .withMessage('La Descripción no puede ir Vació'),
+    handleInputErrors,
+    authenticate, 
+    updateProfile
+)
 
 export default router
