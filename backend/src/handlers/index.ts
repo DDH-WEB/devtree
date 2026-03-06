@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
 import slug from 'slug'
 import User from "../model/User"
 import { checkPassword, hashPassword } from '../utils/auth'
@@ -52,4 +51,8 @@ export const login = async (req: Request, res: Response) => {
 
     // res.send(`Usuario Verificado - Bienvenido ${user.name}`)
     res.send(token)
+}
+
+export const getUserAuthenticated = async (req: Request, res: Response) => {
+    res.json(req.user)
 }
