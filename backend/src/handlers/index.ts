@@ -1,8 +1,12 @@
 import { Request, Response } from 'express'
 import slug from 'slug'
+import { formidable } from 'formidable'
+import { v4 as uuid } from 'uuid'
 import User from "../model/User"
 import { checkPassword, hashPassword } from '../utils/auth'
 import { generateJWT } from '../utils/jwt'
+import supabase from '../config/supabase'
+import fs from 'fs'
 
 export const createAccount = async (req: Request, res: Response) => {
     const { email, password } = req.body
@@ -82,9 +86,52 @@ export const updateProfile = async (req: Request, res: Response) => {
 
         await req.user.save()
         
-        res.json({ message: 'Perfil actualizado correctamente' })
+        res.send('Perfil actualizado correctamente')
     } catch (e) {
         const error = new Error('Error al actualizar el perfil')
         return res.status(500).json({ error: error.message })  
     }
+}
+
+export const uploadImage = async (req: Request, res: Response) => {
+    const form = formidable({ multiples: false })
+
+    form.parse(req, async (error, fields, files) => {
+        if (error) {
+            return res.status(500).json({ error: 'Error al procesar el archivo' })
+        }
+        if (!files.file || !files.file[0]) {
+            return res.status(400).json({ error: 'No se encontró ningún archivo' })
+        }
+
+        try {
+            const file = files.file[0]
+            const fileBuffer = fs.readFileSync(file.filepath)
+            const extension = file.originalFilename?.split('.').pop()
+            const fileName = `${uuid()}.${extension}`
+
+            const { data, error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(fileName, fileBuffer, {
+                    contentType: file.mimetype ?? 'image/jpeg',
+                    upsert: false
+                })
+
+            if (uploadError) {
+                return res.status(500).json({ error: 'Error al subir la imagen' })
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('images')
+                .getPublicUrl(data.path)
+
+            req.user.image = publicUrl
+            await req.user.save()
+            res.json({ image: publicUrl })
+
+        } catch (e) {
+            console.log('❌ Error:', e)
+            res.status(500).json({ error: 'Error al subir la imagen' })
+        }
+    })
 }
